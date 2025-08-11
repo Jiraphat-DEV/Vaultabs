@@ -1,4 +1,4 @@
-# Tab Manager (Brave/Chromium MV3)
+# Vaultabs (Brave/Chromium MV3)
 
 A minimal browser extension to save and manage tabs with a clean UI. Backward compatible with your old backup files.
 
@@ -37,7 +37,7 @@ A minimal browser extension to save and manage tabs with a clean UI. Backward co
 3. Click "Load unpacked" and select this folder
 
 ## Usage
-- Click the extension icon to open Tab Manager
+- Click the extension icon to open Vaultabs
 - Save Open Tabs: export all open tabs to JSON (optional snapshot name)
 - Import JSON: select a file or drag & drop into the drop zone
 - Search / Tag Filter / Sort to narrow the list
@@ -46,7 +46,7 @@ A minimal browser extension to save and manage tabs with a clean UI. Backward co
 
 ### Shortcuts (configurable in browser Shortcuts)
 - `save-tabs`: Save open tabs
-- `open-last-snapshot`: Open Tab Manager
+- `open-last-snapshot`: Open Vaultabs
 
 ### Context menu
 - Save this tab URL

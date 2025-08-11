@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Tab Manager",
+    "name": "Vaultabs",
     "version": "1.0",
     "permissions": [
         "tabs",
@@ -9,7 +9,7 @@
         "contextMenus"
     ],
     "action": {
-        "default_title": "Tab Manager"
+        "default_title": "Vaultabs"
     },
     "host_permissions": [
         "<all_urls>"
@@ -20,6 +20,6 @@
     "incognito": "split",
     "commands": {
         "save-tabs": { "description": "Save open tabs" },
-        "open-last-snapshot": { "description": "Open Tab Manager" }
+        "open-last-snapshot": { "description": "Open Vaultabs" }
     }
 }

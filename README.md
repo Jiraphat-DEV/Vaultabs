@@ -21,6 +21,21 @@ A minimal browser extension to save and manage tabs with a clean UI. Backward co
 3. Enable Developer mode
 4. Click "Load unpacked" and select this folder
 
+### Microsoft Edge
+1. Open `edge://extensions/`
+2. Enable Developer mode
+3. Click "Load unpacked" and select this folder
+
+### Opera
+1. Open `opera://extensions/`
+2. Enable Developer mode
+3. Click "Load unpacked" and select this folder
+
+### Vivaldi
+1. Open `vivaldi://extensions/`
+2. Enable Developer mode
+3. Click "Load unpacked" and select this folder
+
 ## Usage
 - Click the extension icon to open Tab Manager
 - Save Open Tabs: export all open tabs to JSON (optional snapshot name)

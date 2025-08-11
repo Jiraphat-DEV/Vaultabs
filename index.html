@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab Manager</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#111;background:#f7f7f8}
+    .wrap{max-width:980px;margin:24px auto;padding:16px 20px}
+    h2{margin:0;font-size:20px}
+    .rowc{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    input[type=text],select{border:1px solid #ddd;background:#fff;border-radius:10px;padding:9px 12px;font-size:14px}
+    button,.btn{appearance:none;border:1px solid #ddd;background:#fff;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer}
+    button:hover,.btn:hover{border-color:#bbb}
+    #fileInput{display:none}
+    .drop{border:2px dashed #ddd;border-radius:12px;padding:16px;text-align:center;color:#666;margin:8px 0}
+    .drop.drag{border-color:#999;background:#fafafa}
+    .list{list-style:none;margin:12px 0 0;padding:0;border:1px solid #eee;border-radius:12px;overflow:hidden;background:#fff}
+    .row{display:grid;grid-template-columns:32px 24px 1fr 160px 160px;gap:8px;align-items:center;padding:10px 12px;border-top:1px solid #eee}
+    .row:first-child{border-top:none}
+    .num{text-align:center;color:#555}
+    .num.opened{color:#11914a}
+    .fav{width:16px;height:16px}
+    .link{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;color:#0366d6}
+    .link:hover{text-decoration:underline}
+    .link.opened{color:#11914a}
+    .muted{color:#666;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tags{color:#444;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .count{margin-left:auto;color:#666;font-size:13px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="rowc">
+      <h2>Tab Manager</h2>
+      <span id="count" class="count"></span>
+    </div>
+
+    <div class="bar">
+      <input id="name" type="text" placeholder="Snapshot name">
+      <button id="saveTabs">Save Open Tabs</button>
+      <label for="fileInput" class="btn">Import JSON</label>
+      <button id="copyBtn">Copy URLs</button>
+    </div>
+
+    <div class="bar">
+      <input id="q" type="text" placeholder="Search title/url/domain" style="min-width:260px">
+      <input id="tq" type="text" placeholder="Filter tag">
+      <select id="sort">
+        <option value="">Sort</option>
+        <option value="title">Title</option>
+        <option value="domain">Domain</option>
+        <option value="url">URL</option>
+        <option value="date">Date</option>
+      </select>
+      <button id="selectAll">Select All</button>
+      <button id="clearSel">Clear</button>
+      <button id="removeSel">Remove Selected</button>
+      <button id="openSel">Open Selected</button>
+      <button id="openAll">Open All</button>
+      <label class="rowc" style="gap:6px"><input id="newWin" type="checkbox"> New window</label>
+    </div>
+
+    <div class="bar">
+      <input id="tagAdd" type="text" placeholder="Tag">
+      <button id="addTag">Add tag to selected</button>
+    </div>
+
+    <input type="file" id="fileInput" accept="application/json">
+    <div id="drop" class="drop">Drop tabs_backup.json here</div>
+    <ul id="tabsList" class="list"></ul>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

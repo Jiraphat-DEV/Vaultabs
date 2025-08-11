@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Tab Manager",
+    "version": "1.0",
+    "permissions": [
+        "tabs",
+        "storage",
+        "downloads",
+        "contextMenus"
+    ],
+    "action": {
+        "default_title": "Tab Manager"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "incognito": "split",
+    "commands": {
+        "save-tabs": { "description": "Save open tabs" },
+        "open-last-snapshot": { "description": "Open Tab Manager" }
+    }
+}

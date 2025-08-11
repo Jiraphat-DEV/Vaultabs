@@ -39,11 +39,40 @@ saveBtn.addEventListener('click',()=>{
   })
 });
 
-function handleFiles(files){const f=files&&files[0];if(!f)return;const r=new FileReader();r.onload=e=>{try{const j=JSON.parse(e.target.result);let items=Array.isArray(j)?j:(Array.isArray(j.items)?j.items:[]);items=dedupe(normalize(items));data=dedupe(normalize(items.concat(data)));refresh()}catch{}};r.readAsText(f)}
+// Read a single file as text (Promise)
+function readFileAsText(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=e=>resolve(e.target.result);
+    r.onerror=reject;
+    r.readAsText(file);
+  });
+}
+
+// Handle multiple files: merge all items and refresh once
+async function handleFiles(files){
+  const fs=Array.from(files||[]).filter(f=>/\.json$/i.test(f.name)||f.type==="application/json");
+  if(!fs.length) return;
+  try{
+    const texts=await Promise.all(fs.map(readFileAsText));
+    let merged=[];
+    for(const txt of texts){
+      try{
+        const j=JSON.parse(txt);
+        const items=Array.isArray(j)?j:(Array.isArray(j.items)?j.items:[]);
+        merged=merged.concat(items||[]);
+      }catch{ /* skip invalid */ }
+    }
+    merged=dedupe(normalize(merged));
+    data=dedupe(normalize(merged.concat(data)));
+    refresh();
+  }catch{ /* ignore */ }
+}
 
 input.addEventListener('change',e=>handleFiles(e.target.files));
 ;['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('drag')}));
 ;['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('drag')}));
+// Support dropping multiple files
 drop.addEventListener('drop',e=>{handleFiles(e.dataTransfer.files)});
 
 q.addEventListener('input',refresh);tq.addEventListener('input',refresh);sortSel.addEventListener('change',refresh);

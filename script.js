@@ -107,6 +107,16 @@ function normalize(arr){
   })
 }
 function dedupe(arr){const seen=new Set();const out=[];for(const it of arr){if(!it||!it.url)continue;const k=it.url.trim();if(!k||seen.has(k))continue;seen.add(k);out.push(it)}return out}
+
+// Merge helper: base keeps priority; extra merged in; union tags; keep metadata
+function mergeByUrl(baseArr, extraArr){
+  const base=normalize(baseArr||[]);
+  const extra=normalize(extraArr||[]);
+  const map=new Map();
+  for(const a of base){const k=(a.url||'').trim();if(!k)continue;map.set(k,{...a});}
+  for(const b of extra){const k=(b.url||'').trim();if(!k)continue; if(!map.has(k)){map.set(k,{...b});continue;} const a=map.get(k); const merged={...a,url:k,title:a.title||b.title,domain:a.domain||b.domain,pinned:!!(a.pinned||b.pinned),tags:Array.from(new Set([...(a.tags||[]),...(b.tags||[])])),date:Math.max(Number(a.date||0),Number(b.date||0))}; for(const [key,val] of Object.entries(b)){ if(!(key in merged) && key!=='url'){ merged[key]=val; } } map.set(k,merged);}
+  return Array.from(map.values());
+}
 function filtered(){let arr=[...data];const qq=q.value.trim().toLowerCase();const tqv=tq.value.trim().toLowerCase();if(qq){arr=arr.filter(it=>`${it.title||''} ${it.url||''} ${it.domain||''}`.toLowerCase().includes(qq))}if(tqv){arr=arr.filter(it=>(it.tags||[]).some(t=>t.toLowerCase().includes(tqv)))}const s=sortSel.value;if(s==='title'){arr.sort((a,b)=>String(a.title||'').localeCompare(b.title||''))}else if(s==='domain'){arr.sort((a,b)=>String(a.domain||'').localeCompare(b.domain||''))}else if(s==='url'){arr.sort((a,b)=>String(a.url||'').localeCompare(b.url||''))}else if(s==='date'){arr.sort((a,b)=>Number(b.date||0)-Number(a.date||0))}return arr}
 function refresh(){render(filtered());updateHeaderActiveSort()}
 
@@ -137,8 +147,13 @@ list.addEventListener('click',e=>{
 
 saveBtn.addEventListener('click',()=>{
   chrome.tabs.query({},tabs=>{
-    const items=tabs.filter(t=>t.url&&!t.url.startsWith('chrome-extension://')).map(t=>({url:t.url,title:t.title,domain:(()=>{try{return new URL(t.url).hostname}catch{return ''}})(),pinned:!!t.pinned,tags:[],date:Date.now()}));
-    data=dedupe(normalize(items));
+    const items=tabs
+      .filter(t=>t.url&&!t.url.startsWith('chrome-extension://'))
+      .map(t=>({url:t.url,title:t.title,domain:(()=>{try{return new URL(t.url).hostname}catch{return ''}})(),pinned:!!t.pinned,tags:[],date:Date.now()}));
+
+    // Merge with existing imported data (preserve tags/metadata)
+    data=mergeByUrl(data, items);
+
     metaName=nameEl.value.trim()||'';const filename=`tabs_${ts()}.json`;
     const payload={name:metaName||undefined,createdAt:Date.now(),items:data};
     const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
@@ -169,12 +184,11 @@ async function handleFiles(files){
       try{
         const j=JSON.parse(txt);
         const items=Array.isArray(j)?j:(Array.isArray(j.items)?j.items:[]);
-        // attach source filename as __source
         merged=merged.concat((items||[]).map(it=>({...it,__source:it.__source||fname})));
       }catch{ /* skip invalid */ }
     }
-    merged=dedupe(normalize(merged));
-    data=dedupe(normalize(merged.concat(data)));
+    // Merge imported items with existing data
+    data=mergeByUrl(data, merged);
     refresh();
   }catch{ /* ignore */ }
 }
@@ -232,8 +246,8 @@ removeDupBtn?.addEventListener('click',()=>{
 
 chrome.runtime.onMessage.addListener((msg)=>{
   if(msg.type==='SAVE_ALL'){saveBtn.click()}
-  if(msg.type==='SAVE_SINGLE'&&msg.url){const it={url:msg.url,title:msg.title||msg.url,domain:(()=>{try{return new URL(msg.url).hostname}catch{return ''}})(),pinned:false,tags:[],date:Date.now()};data=dedupe(normalize([it].concat(data)));refresh()}
-  if(msg.type==='SAVE_DOMAIN'&&msg.domain){chrome.tabs.query({},tabs=>{const items=tabs.filter(t=>{try{return new URL(t.url).hostname===msg.domain}catch{return false}}).map(t=>({url:t.url,title:t.title,domain:msg.domain,pinned:!!t.pinned,tags:[],date:Date.now()}));data=dedupe(normalize(items.concat(data)));refresh()})}
+  if(msg.type==='SAVE_SINGLE'&&msg.url){const it={url:msg.url,title:msg.title||msg.url,domain:(()=>{try{return new URL(msg.url).hostname}catch{return ''}})(),pinned:false,tags:[],date:Date.now()};data=mergeByUrl(data,[it]);refresh()}
+  if(msg.type==='SAVE_DOMAIN'&&msg.domain){chrome.tabs.query({},tabs=>{const items=tabs.filter(t=>{try{return new URL(t.url).hostname===msg.domain}catch{return false}}).map(t=>({url:t.url,title:t.title,domain:msg.domain,pinned:!!t.pinned,tags:[],date:Date.now()}));data=mergeByUrl(data,items);refresh()})}
 });
 
 setCount(0);
